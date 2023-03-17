@@ -1,4 +1,4 @@
-Experimental one-way messaing through shared memory. Utilizes more resources but has way lower latency in compared to unix socket.
+Experimental one-way messaging through shared memory. Utilizes more resources but has way lower latency in compared to unix socket.
 On my machine unix latency is around 90μs meanwhile in tests its within few.
 
 
