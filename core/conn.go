@@ -6,6 +6,7 @@ import (
 	"math"
 	"time"
 
+	"github.com/Exca-DK/go-mempipe/core/links"
 	"github.com/Exca-DK/go-mempipe/core/primitives"
 )
 
@@ -213,6 +214,7 @@ func (h *sessionState) WaitWrite(conn *primitives.SharedMemMount) error {
 			break
 		}
 
+		links.Wait()
 	}
 
 	return nil
@@ -230,10 +232,10 @@ func (h *sessionState) WaitRead(conn *primitives.SharedMemMount) error {
 					return ErrReadTimedout
 				}
 			}
-
 		} else {
 			break
 		}
+		links.Wait()
 	}
 	return nil
 }

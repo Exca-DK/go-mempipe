@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/rand"
 	"testing"
+	"time"
 )
 
 func TestPipe(t *testing.T) {
@@ -45,6 +46,36 @@ func TestPipe(t *testing.T) {
 
 		if string(srcMsg.Payload) != buffer.String() {
 			t.Fatalf("diff msg. got: %v, want: %v\n", string(srcMsg.Payload), string(msgData))
+		}
+	}
+}
+
+func TestCpuUsage(t *testing.T) {
+	conn1 := connSetup(t, true, 1024*100)
+	conn2 := connSetup(t, false, 1024*10)
+	var (
+		msgData = make([]byte, 1024)
+	)
+
+	rand.Read(msgData)
+
+	buffer := bytes.NewBuffer(make([]byte, 0))
+	for i := 0; i < 10; i++ {
+		buffer.Write(msgData)
+	}
+
+	pipeWriter := newMemPipe(conn1)
+	pipeRecv := newMemPipe(conn2)
+	defer pipeWriter.Close()
+	defer pipeRecv.Close()
+
+	pipeWriter.SetWriteDeadline(1 * time.Minute)
+	pipeRecv.SetReadDeadline(1 * time.Minute)
+
+	for {
+		srcMsg := NewMessage(10, buffer.Bytes(), buffer.Len())
+		if err := pipeWriter.WriteMsg(srcMsg); err != nil {
+			return
 		}
 	}
 }
